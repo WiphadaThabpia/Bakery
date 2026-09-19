@@ -8,7 +8,7 @@
         body { 
             margin: 0; 
             overflow: hidden; 
-            background-color: #1a1a1a; 
+            background-color: #87CEEB; /* สีฟ้าท้องฟ้า */
         }
         canvas { 
             display: block; 
@@ -19,7 +19,6 @@
 </head>
 <body>
 
-    <!-- สลับมาใช้ cdnjs เพื่อความเสถียร ป้องกันปัญหา Script Block -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -28,7 +27,7 @@
     <script>
         // 1. Setup Scene & Camera
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a1a);
+        scene.background = new THREE.Color(0x87CEEB); // เปลี่ยนพื้นหลังเป็นสีฟ้าท้องฟ้า (Sky Blue)
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
         camera.position.set(0, 1.5, 3);
@@ -41,11 +40,13 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // 2. แสงสว่าง
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        // 2. ปรับลดแสงลง ไม่ให้สว่างจ้าเกินไป
+        // AmbientLight: แสงโดยรอบ (ลดจาก 1.5 เหลือ 0.6)
+        const ambientLight = new THREE.AmbientLight(0xfff8ed, 0.6); 
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        // DirectionalLight: แสงเงา/แสงหลัก (ลดจาก 2.0 เหลือ 0.8)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(5, 10, 7.5);
         scene.add(directionalLight);
 
@@ -55,11 +56,10 @@
         dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
         loader.setDRACOLoader(dracoLoader);
 
-        // แก้ไขพาธตรงนี้: ให้วางไฟล์ Bekery.glb ไว้โฟลเดอร์เดียวกับ index.html
         loader.load('./Bekery.glb', (gltf) => {
             const model = gltf.scene;
 
-            // จัดตำแหน่งโมเดลให้อยู่จุดศูนย์กลางฉากพอดี
+            // จัดตำแหน่งโมเดลให้อยู่จุดศูนย์กลาง
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             model.position.sub(center);
@@ -78,7 +78,7 @@
         }
         animate();
 
-        // ปรับขนาดอัตโนมัติเมื่อย่อ/ขยายหน้าจอ
+        // ปรับขนาดตามหน้าจอ
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
