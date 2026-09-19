@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Model - Shushi</title>
+    <title>3D Model - Bakery</title>
     <style>
         body { 
             margin: 0; 
@@ -19,8 +19,8 @@
 </head>
 <body>
 
-    <!-- Core Three.js & Loaders -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <!-- สลับมาใช้ cdnjs เพื่อความเสถียร ป้องกันปัญหา Script Block -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
@@ -49,21 +49,23 @@
         directionalLight.position.set(5, 10, 7.5);
         scene.add(directionalLight);
 
-        // 3. โหลดโมเดล Shushi.glb โดยตรง
+        // 3. โหลดโมเดล 3D
         const loader = new THREE.GLTFLoader();
         const dracoLoader = new THREE.DRACOLoader();
         dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
         loader.setDRACOLoader(dracoLoader);
 
-        loader.load('https://github.com/WiphadaThabpia/Bakery/blob/main/Bekery.glb', (gltf) => {
+        // แก้ไขพาธตรงนี้: ให้วางไฟล์ Bekery.glb ไว้โฟลเดอร์เดียวกับ index.html
+        loader.load('./Bekery.glb', (gltf) => {
             const model = gltf.scene;
 
-            // จัดตำแหน่งโมเดลให้อยู่จุดศูนย์กลางกลางฉากพอดี
+            // จัดตำแหน่งโมเดลให้อยู่จุดศูนย์กลางฉากพอดี
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             model.position.sub(center);
 
             scene.add(model);
+            console.log("โหลดโมเดลสำเร็จ!");
         }, undefined, (error) => {
             console.error('เกิดข้อผิดพลาดในการโหลดโมเดล:', error);
         });
@@ -85,4 +87,3 @@
     </script>
 </body>
 </html>
-cdn.jsdelivr.net
