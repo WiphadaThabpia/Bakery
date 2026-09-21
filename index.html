@@ -65,7 +65,6 @@
     Math.min(devicePixelRatio, 2)
   );
 
-  // ให้สีของ GLB ใกล้เคียงกับ Blender
   renderer.outputEncoding = THREE.sRGBEncoding;
 
   document.body.appendChild(
@@ -95,34 +94,32 @@
   // LIGHT
   // =========================
 
-  // แสงโดยรวม
   const ambientLight =
     new THREE.AmbientLight(
       0xffffff,
-      0.7
+      0.55
     );
 
   scene.add(ambientLight);
 
 
-  // แสงหลักแบบนุ่ม
   const light =
     new THREE.DirectionalLight(
       0xffffff,
-      0.5
+      0.35
     );
 
   light.position.set(
-    3,
     5,
-    8
+    3,
+    10
   );
 
   scene.add(light);
 
 
   // =========================
-  // LOAD BAKERY GLB
+  // LOAD BAKERY
   // =========================
 
   const loader =
@@ -139,10 +136,7 @@
       scene.add(bakery);
 
 
-      // -------------------------
-      // หาขนาดของโมเดล
-      // -------------------------
-
+      // หาขนาดโมเดล
       const box =
         new THREE.Box3()
           .setFromObject(bakery);
@@ -158,15 +152,17 @@
       box.getSize(size);
 
 
-      // -------------------------
-      // กล้อง
-      // -------------------------
+      // =========================
+      // CAMERA POSITION
+      // =========================
 
-      // มองจากฝั่งหน้าร้าน
+      // มุมตามภาพ Blender
+      // มองเข้าหาหน้าร้านตามแกน X
+
       camera.position.set(
-        center.x,
-        box.max.y + size.y * 1.5,
-        center.z + size.z * 0.35
+        box.max.x + size.x * 1.6,
+        center.y,
+        center.z + size.z * 0.15
       );
 
 
@@ -177,7 +173,6 @@
         center.z
       );
 
-
       camera.lookAt(
         controls.target
       );
@@ -185,16 +180,12 @@
       controls.update();
 
 
-      console.log(
-        'Bakery loaded'
-      );
-
-      console.log(
-        'Bakery size:',
-        size
-      );
+      console.log('Bakery loaded');
+      console.log('Size:', size);
+      console.log('Center:', center);
 
     },
+
 
     function(xhr) {
 
@@ -208,6 +199,7 @@
       }
 
     },
+
 
     function(error) {
 
