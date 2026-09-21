@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Bakery 3D</title>
 
   <style>
@@ -25,14 +26,20 @@
 
 <script>
 
-  // Scene
+  // =========================
+  // SCENE
+  // =========================
+
   const scene = new THREE.Scene();
 
   // พื้นหลังสีครีมอ่อน
   scene.background = new THREE.Color(0xFFF4E3);
 
 
-  // Camera
+  // =========================
+  // CAMERA
+  // =========================
+
   const camera = new THREE.PerspectiveCamera(
     50,
     innerWidth / innerHeight,
@@ -41,21 +48,35 @@
   );
 
 
-  // Renderer
+  // =========================
+  // RENDERER
+  // =========================
+
   const renderer = new THREE.WebGLRenderer({
     antialias: true
   });
 
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
 
-  // ให้สีจาก GLB แสดงใกล้เคียงสีต้นฉบับ
+  renderer.setPixelRatio(
+    Math.min(devicePixelRatio, 2)
+  );
+
+  // ให้สีของ GLB ใกล้เคียงกับ Blender
   renderer.outputEncoding = THREE.sRGBEncoding;
 
-  document.body.appendChild(renderer.domElement);
+  document.body.appendChild(
+    renderer.domElement
+  );
 
 
-  // Controls
+  // =========================
+  // CONTROLS
+  // =========================
+
   const controls = new THREE.OrbitControls(
     camera,
     renderer.domElement
@@ -63,72 +84,88 @@
 
   controls.enableDamping = true;
 
-  // ไม่ให้ซูมใกล้/ไกลเกินไป
+  controls.dampingFactor = 0.05;
+
   controls.minDistance = 5;
+
   controls.maxDistance = 30;
 
 
-  // -------------------------
+  // =========================
   // LIGHT
-  // -------------------------
+  // =========================
 
-  // แสงโดยรวมแบบนุ่ม ๆ
-  const ambientLight = new THREE.AmbientLight(
-    0xffffff,
-    1.5
-  );
+  // แสงโดยรวม
+  const ambientLight =
+    new THREE.AmbientLight(
+      0xffffff,
+      0.7
+    );
 
   scene.add(ambientLight);
 
 
-  // แสงด้านบน/ด้านหน้า
-  const light = new THREE.DirectionalLight(
-    0xffffff,
-    1.2
-  );
+  // แสงหลักแบบนุ่ม
+  const light =
+    new THREE.DirectionalLight(
+      0xffffff,
+      0.5
+    );
 
-  light.position.set(5, -8, 12);
+  light.position.set(
+    3,
+    5,
+    8
+  );
 
   scene.add(light);
 
 
-  // -------------------------
-  // LOAD BAKERY
-  // -------------------------
+  // =========================
+  // LOAD BAKERY GLB
+  // =========================
 
-  const loader = new THREE.GLTFLoader();
+  const loader =
+    new THREE.GLTFLoader();
 
   loader.load(
     'Bekery.glb',
 
-    function (gltf) {
+    function(gltf) {
 
-      const bakery = gltf.scene;
+      const bakery =
+        gltf.scene;
 
       scene.add(bakery);
 
 
-      // หา Bounding Box ของร้าน
-      const box = new THREE.Box3().setFromObject(bakery);
+      // -------------------------
+      // หาขนาดของโมเดล
+      // -------------------------
 
-      const center = new THREE.Vector3();
+      const box =
+        new THREE.Box3()
+          .setFromObject(bakery);
+
+      const center =
+        new THREE.Vector3();
 
       box.getCenter(center);
 
-
-      const size = new THREE.Vector3();
+      const size =
+        new THREE.Vector3();
 
       box.getSize(size);
 
 
       // -------------------------
-      // CAMERA
+      // กล้อง
       // -------------------------
 
-      // ให้กล้องมองตรงหน้าร้าน
+      // มองจากฝั่งหน้าร้าน
       camera.position.set(
         center.x,
-        box.min.y - size.y * 1.8,
+        box.max.y + size.y * 1.5,
         center.z + size.z * 0.35
       );
 
@@ -137,31 +174,42 @@
       controls.target.set(
         center.x,
         center.y,
-        center.z * 0.9
+        center.z
       );
 
 
-      camera.lookAt(controls.target);
+      camera.lookAt(
+        controls.target
+      );
 
-
-      // ปรับระยะกล้องให้เห็นร้านครบ
       controls.update();
 
 
-      console.log('Bakery loaded');
-      console.log('Size:', size);
-    },
-
-    function (xhr) {
+      console.log(
+        'Bakery loaded'
+      );
 
       console.log(
-        (xhr.loaded / xhr.total * 100) +
-        '% loaded'
+        'Bakery size:',
+        size
       );
 
     },
 
-    function (error) {
+    function(xhr) {
+
+      if (xhr.total > 0) {
+
+        console.log(
+          'Loading:',
+          (xhr.loaded / xhr.total * 100).toFixed(0) + '%'
+        );
+
+      }
+
+    },
+
+    function(error) {
 
       console.error(
         'โหลด Bekery.glb ไม่สำเร็จ',
@@ -172,36 +220,41 @@
   );
 
 
-  // -------------------------
+  // =========================
   // RESIZE
-  // -------------------------
+  // =========================
 
-  addEventListener('resize', () => {
+  addEventListener(
+    'resize',
+    () => {
 
-    camera.aspect =
-      innerWidth / innerHeight;
+      camera.aspect =
+        innerWidth / innerHeight;
 
-    camera.updateProjectionMatrix();
+      camera.updateProjectionMatrix();
 
-    renderer.setSize(
-      innerWidth,
-      innerHeight
-    );
+      renderer.setSize(
+        innerWidth,
+        innerHeight
+      );
 
-    renderer.setPixelRatio(
-      Math.min(devicePixelRatio, 2)
-    );
+      renderer.setPixelRatio(
+        Math.min(devicePixelRatio, 2)
+      );
 
-  });
+    }
+  );
 
 
-  // -------------------------
+  // =========================
   // ANIMATION
-  // -------------------------
+  // =========================
 
   function animate() {
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+      animate
+    );
 
     controls.update();
 
